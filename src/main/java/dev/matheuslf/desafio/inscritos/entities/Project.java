@@ -2,6 +2,7 @@ package dev.matheuslf.desafio.inscritos.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Table(name = "projects")
 @Setter
 @Getter
+@RequiredArgsConstructor
 public class Project {
 
     @Id
@@ -29,7 +31,14 @@ public class Project {
     @Column(nullable = true)
     private LocalDate endDate;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    public Project(String name, String description, LocalDate startDate, LocalDate endDate) {
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }
