@@ -8,6 +8,8 @@ import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
@@ -20,4 +22,11 @@ public class ProjectService {
         Project savedProject = projectRepository.save(entity);
         return projectMapper.toDTO(savedProject);
     }
+
+    public List<ProjectResponseDTO> findAllProjects() {
+        return projectRepository.findAll().stream()
+                .map(projectMapper::toDTO)
+                .toList();
+    }
+
 }
