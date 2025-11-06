@@ -5,6 +5,8 @@ import dev.matheuslf.desafio.inscritos.entities.enums.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,9 +28,15 @@ public class Task {
     @Column(length = 255, nullable = false)
     private String description;
 
-    private Status status;
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "status")
+    private Status status = Status.TODO;
 
-    private Priority priority;
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "priority")
+    private Priority priority = Priority.LOW;
 
     private LocalDate dueDate;
 
