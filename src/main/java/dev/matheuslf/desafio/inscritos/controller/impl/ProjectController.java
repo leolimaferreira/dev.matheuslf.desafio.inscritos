@@ -6,10 +6,9 @@ import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +23,10 @@ public class ProjectController implements GenericController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectResponseDTO>> findAll() {
-        return ResponseEntity.ok(projectService.findAllProjects());
+    public ResponseEntity<Page<ProjectResponseDTO>> findAll(@RequestParam(value = "page", defaultValue = "0")
+                                                            Integer page,
+                                                            @RequestParam(value = "size", defaultValue = "10")
+                                                            Integer size) {
+        return ResponseEntity.ok(projectService.findAllProjects(page, size));
     }
 }
