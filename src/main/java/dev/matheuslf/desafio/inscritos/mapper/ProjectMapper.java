@@ -5,8 +5,6 @@ import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
 public class ProjectMapper {
 
