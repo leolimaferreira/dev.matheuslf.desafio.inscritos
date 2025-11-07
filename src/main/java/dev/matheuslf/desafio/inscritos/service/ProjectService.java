@@ -3,6 +3,7 @@ package dev.matheuslf.desafio.inscritos.service;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
+import dev.matheuslf.desafio.inscritos.exception.ConflictException;
 import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
 import dev.matheuslf.desafio.inscritos.exception.ProjectWithActiveTasksException;
 import dev.matheuslf.desafio.inscritos.mapper.ProjectMapper;
@@ -23,6 +24,7 @@ public class ProjectService {
     private final TaskService taskService;
 
     public ProjectResponseDTO saveProject(ProjectRequestDTO dto) {
+        if (projectRepository.existsByName(dto.name())) throw new ConflictException("There is already a project with this name.");
         Project entity = projectMapper.toEntity(dto);
         Project savedProject = projectRepository.save(entity);
         return projectMapper.toDTO(savedProject);

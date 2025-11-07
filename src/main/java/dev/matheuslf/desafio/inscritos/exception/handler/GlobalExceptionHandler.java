@@ -1,6 +1,7 @@
 package dev.matheuslf.desafio.inscritos.exception.handler;
 
 import dev.matheuslf.desafio.inscritos.dto.error.ResponseError;
+import dev.matheuslf.desafio.inscritos.exception.ConflictException;
 import dev.matheuslf.desafio.inscritos.exception.InvalidFieldException;
 import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
 import dev.matheuslf.desafio.inscritos.exception.ProjectWithActiveTasksException;
@@ -24,6 +25,12 @@ public class GlobalExceptionHandler{
     public ResponseError handleNotFoundException(NotFoundException e) {
         log.error("Resource not found: {}", e.getMessage());
         return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseError handleDuplicatedRegistryException(ConflictException e) {
+        return ResponseError.conflict(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
