@@ -9,6 +9,7 @@ import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
 import dev.matheuslf.desafio.inscritos.entities.enums.Status;
 import dev.matheuslf.desafio.inscritos.mapper.TaskMapper;
 import dev.matheuslf.desafio.inscritos.repository.TaskRepository;
+import dev.matheuslf.desafio.inscritos.validator.TaskValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,17 +26,36 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final TaskValidator taskValidator;
 
     public TaskResponseDTO saveTask(TaskRequestDTO dto) {
-        Task entity = taskMapper.toEntity(dto);
-        Task savedTask = taskRepository.save(entity);
+        boolean priorityHigh = dto.priority().equals(Priority.HIGH.toString());
+        Task task = taskMapper.toEntity(dto);
+
+        taskValidator.validateProjectEndDate(task.getProject());
+
+        if (priorityHigh) {
+            taskValidator.validateNumberOfHighTasks(task.getProject());
+            taskValidator.validateDescription(dto.description());
+        }
+
+        Task savedTask = taskRepository.save(task);
         return taskMapper.toDTO(savedTask);
     }
 
     public TaskResponseDTO updateTask(UUID id, UpdateTaskDTO dto) {
-        Task entity = taskRepository.findById(id).orElseThrow( () -> new RuntimeException("Task not found"));
-        taskMapper.updateEntity(entity, dto);
-        Task savedTask = taskRepository.save(entity);
+        Task task = taskRepository.findById(id).orElseThrow( () -> new RuntimeException("Task not found"));
+        boolean priorityHigh = dto.priority().equals(Priority.HIGH.toString());
+
+        taskValidator.validateProjectEndDate(task.getProject());
+
+        if (priorityHigh) {
+            taskValidator.validateNumberOfHighTasks(task.getProject());
+            taskValidator.validateDescription(dto.description());
+        }
+
+        taskMapper.updateEntity(task, dto);
+        Task savedTask = taskRepository.save(task);
         return taskMapper.toDTO(savedTask);
     }
 
