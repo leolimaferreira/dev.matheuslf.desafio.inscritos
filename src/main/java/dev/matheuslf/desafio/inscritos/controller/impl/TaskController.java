@@ -4,9 +4,12 @@ import dev.matheuslf.desafio.inscritos.controller.GenericController;
 import dev.matheuslf.desafio.inscritos.dto.task.TaskRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.task.TaskResponseDTO;
 import dev.matheuslf.desafio.inscritos.dto.task.UpdateTaskDTO;
+import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
+import dev.matheuslf.desafio.inscritos.entities.enums.Status;
 import dev.matheuslf.desafio.inscritos.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,5 +33,30 @@ public class TaskController implements GenericController {
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> update(@PathVariable("id") UUID id, @RequestBody @Valid UpdateTaskDTO dto) {
         return ResponseEntity.ok(taskService.updateTask(id, dto));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<TaskResponseDTO>> findWithParams(
+            @RequestParam(value = "title", required = false)
+            String title,
+            @RequestParam(value = "description", required = false)
+            String description,
+            @RequestParam(value = "status", required = false)
+            Status status,
+            @RequestParam(value = "priority", required = false)
+            Priority priority,
+            @RequestParam(value = "projectName", required = false)
+            String projectName,
+            @RequestParam(value = "page", defaultValue = "0")
+            Integer page,
+            @RequestParam(value = "size", defaultValue = "10")
+            Integer size
+    ) {
+        return ResponseEntity.ok(taskService.findTasksWithParams(title, description, status, priority, projectName, page, size));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TaskResponseDTO> delete(@PathVariable("id") UUID id) {
+        return ResponseEntity.ok(taskService.deleteTask(id));
     }
 }
