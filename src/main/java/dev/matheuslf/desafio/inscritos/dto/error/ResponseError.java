@@ -21,4 +21,8 @@ public record ResponseError(
     public static ResponseError unprocessbleEntity(String mensagem) {
         return new ResponseError(HttpStatus.UNPROCESSABLE_ENTITY.value(), mensagem, List.of());
     }
+
+    public static ResponseError of(HttpStatus status, String message, List<FieldError> errors) {
+        return new ResponseError(status.value(), message, errors);
+    }
 }
