@@ -2,17 +2,20 @@ package dev.matheuslf.desafio.inscritos.service;
 
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
+import dev.matheuslf.desafio.inscritos.dto.project.UpdateProjectDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
 import dev.matheuslf.desafio.inscritos.exception.ConflictException;
 import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
 import dev.matheuslf.desafio.inscritos.exception.ProjectWithActiveTasksException;
 import dev.matheuslf.desafio.inscritos.mapper.ProjectMapper;
 import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
+import dev.matheuslf.desafio.inscritos.validator.ProjectValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -22,11 +25,17 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
     private final TaskService taskService;
+    private final ProjectValidator projectValidator;
 
     public ProjectResponseDTO saveProject(ProjectRequestDTO dto) {
-        if (projectRepository.existsByName(dto.name())) throw new ConflictException("There is already a project with this name.");
-        Project entity = projectMapper.toEntity(dto);
-        Project savedProject = projectRepository.save(entity);
+        Project project = projectMapper.toEntity(dto);
+        projectValidator.validate(project);
+
+        if (dto.endDate().isBefore(project.getStartDate())) {
+            throw new ConflictException("Project's start date must be before the end date.");
+        }
+
+        Project savedProject = projectRepository.save(project);
         return projectMapper.toDTO(savedProject);
     }
 
@@ -43,6 +52,23 @@ public class ProjectService {
         }
         projectRepository.delete(project);
         projectMapper.toDTO(project);
+    }
+
+    public ProjectResponseDTO updateProject(UUID id, UpdateProjectDTO dto) {
+        Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException("Project not found"));
+        projectValidator.validate(project);
+
+        if (project.getStartDate().isBefore(LocalDate.now())) {
+            throw new ConflictException("You cannot update a project that has been already started.");
+        }
+
+        if (project.getEndDate().isBefore(dto.startDate()) || dto.endDate().isBefore(project.getStartDate())) {
+            throw new ConflictException("Project's start date must be before the end date.");
+        }
+
+        projectMapper.updateEntity(project, dto);
+        Project updatedProject = projectRepository.save(project);
+        return projectMapper.toDTO(updatedProject);
     }
 
 }

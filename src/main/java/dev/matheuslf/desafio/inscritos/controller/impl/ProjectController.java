@@ -3,6 +3,7 @@ package dev.matheuslf.desafio.inscritos.controller.impl;
 import dev.matheuslf.desafio.inscritos.controller.GenericController;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
+import dev.matheuslf.desafio.inscritos.dto.project.UpdateProjectDTO;
 import dev.matheuslf.desafio.inscritos.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class ProjectController implements GenericController {
                                                             @RequestParam(value = "size", defaultValue = "10")
                                                             Integer size) {
         return ResponseEntity.ok(projectService.findAllProjects(page, size));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProjectResponseDTO> update(@PathVariable(value = "id") UUID id, @RequestBody @Valid UpdateProjectDTO dto) {
+        return ResponseEntity.ok(projectService.updateProject(id, dto));
     }
 
     @DeleteMapping("/{id}")
