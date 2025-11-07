@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/projects")
@@ -28,5 +30,11 @@ public class ProjectController implements GenericController {
                                                             @RequestParam(value = "size", defaultValue = "10")
                                                             Integer size) {
         return ResponseEntity.ok(projectService.findAllProjects(page, size));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable(value = "id") UUID id) {
+        projectService.deleteProject(id);
+        return ResponseEntity.noContent().build();
     }
 }

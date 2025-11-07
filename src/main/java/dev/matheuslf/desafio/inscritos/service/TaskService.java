@@ -3,6 +3,7 @@ package dev.matheuslf.desafio.inscritos.service;
 import dev.matheuslf.desafio.inscritos.dto.task.TaskRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.task.TaskResponseDTO;
 import dev.matheuslf.desafio.inscritos.dto.task.UpdateTaskDTO;
+import dev.matheuslf.desafio.inscritos.entities.Project;
 import dev.matheuslf.desafio.inscritos.entities.Task;
 import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
 import dev.matheuslf.desafio.inscritos.entities.enums.Status;
@@ -38,10 +39,10 @@ public class TaskService {
         return taskMapper.toDTO(savedTask);
     }
 
-    public TaskResponseDTO deleteTask(UUID id) {
+    public void deleteTask(UUID id) {
         Task entity = taskRepository.findById(id).orElseThrow( () -> new RuntimeException("Task not found"));
         taskRepository.delete(entity);
-        return taskMapper.toDTO(entity);
+        taskMapper.toDTO(entity);
     }
 
     public Page<TaskResponseDTO> findTasksWithParams(String title, String description, Status status, Priority priority, String projectName, Integer page, Integer size) {
@@ -72,5 +73,9 @@ public class TaskService {
         Page<Task> tasks = taskRepository.findAll(specs, pageRequest);
 
         return tasks.map(taskMapper::toDTO);
+    }
+
+    public boolean hasDoingTasks(Project project) {
+        return taskRepository.existsByProjectAndStatus(project, Status.DOING);
     }
 }

@@ -56,7 +56,8 @@ public class TaskController implements GenericController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> delete(@PathVariable("id") UUID id) {
-        return ResponseEntity.ok(taskService.deleteTask(id));
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
 }
