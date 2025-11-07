@@ -33,6 +33,7 @@ public class TaskService {
         Task task = taskMapper.toEntity(dto);
 
         taskValidator.validateProjectEndDate(task.getProject());
+        taskValidator.validateTaskDueDate(task.getDueDate(), task.getProject());
 
         if (priorityHigh) {
             taskValidator.validateNumberOfHighTasks(task.getProject());
@@ -48,6 +49,7 @@ public class TaskService {
         boolean priorityHigh = dto.priority().equals(Priority.HIGH.toString());
 
         taskValidator.validateProjectEndDate(task.getProject());
+        taskValidator.validateTaskDueDate(task.getDueDate(), task.getProject());
 
         if (priorityHigh) {
             taskValidator.validateNumberOfHighTasks(task.getProject());

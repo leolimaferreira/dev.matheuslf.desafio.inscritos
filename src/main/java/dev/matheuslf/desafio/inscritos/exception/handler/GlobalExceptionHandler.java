@@ -58,22 +58,29 @@ public class GlobalExceptionHandler{
 
     @ExceptionHandler(ProjectEndedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseError handleProjectWithActiveTasksException(ProjectEndedException e) {
+    public ResponseError handleProjectEndedException(ProjectEndedException e) {
         log.error("Cannot update task: {}", e.getMessage());
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
     }
 
     @ExceptionHandler(DescriptionNeededException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseError handleProjectWithActiveTasksException(DescriptionNeededException e) {
+    public ResponseError handleDescriptionNeededException(DescriptionNeededException e) {
         log.error("Cannot create/update task: {}", e.getMessage());
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
     }
 
     @ExceptionHandler(NumberOfHighTasksExceedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseError handleProjectWithActiveTasksException(NumberOfHighTasksExceedException e) {
+    public ResponseError handleNumberOfHighTasksExceedException(NumberOfHighTasksExceedException e) {
         log.error("Cannot create task: {}", e.getMessage());
+        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(InvalidTaskDueDateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleInvalidTaskDueDateException(InvalidTaskDueDateException e) {
+        log.error("Invalid task due date: {}", e.getMessage());
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
     }
 
