@@ -35,6 +35,10 @@ public class Project {
 
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     public Project(String name, String description, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.description = description;
