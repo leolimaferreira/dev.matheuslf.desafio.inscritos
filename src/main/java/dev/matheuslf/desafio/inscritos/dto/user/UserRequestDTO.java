@@ -1,5 +1,7 @@
 package dev.matheuslf.desafio.inscritos.dto.user;
 
+import dev.matheuslf.desafio.inscritos.annotation.StrongPassword;
+import dev.matheuslf.desafio.inscritos.annotation.ValidRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,7 +15,9 @@ public record UserRequestDTO(
         String email,
         @NotBlank(message = "Password cannot be blank.")
         @Size(min = 8, max = 20, message = "Password cannot be shorter than 8 characters or longer than 100 characters.")
+        @StrongPassword
         String password,
+        @ValidRole
         String role
 ) {
 }

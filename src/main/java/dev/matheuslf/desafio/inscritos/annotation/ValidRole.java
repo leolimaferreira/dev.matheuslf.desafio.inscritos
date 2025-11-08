@@ -1,16 +1,16 @@
 package dev.matheuslf.desafio.inscritos.annotation;
 
-import dev.matheuslf.desafio.inscritos.validator.StatusValidator;
+import dev.matheuslf.desafio.inscritos.validator.RoleValidator;
 import jakarta.validation.Constraint;
 
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = StatusValidator.class)
+@Constraint(validatedBy = RoleValidator.class)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidStatus {
-    String message() default "Invalid status";
+public @interface ValidRole {
+    String message() default "Invalid role";
 
     Class<?>[] groups() default {};
 
