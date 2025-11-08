@@ -1,16 +1,16 @@
-package dev.matheuslf.desafio.inscritos.controller.annotation;
+package dev.matheuslf.desafio.inscritos.annotation;
 
-import dev.matheuslf.desafio.inscritos.validator.PriorityValidator;
+import dev.matheuslf.desafio.inscritos.validator.StatusValidator;
 import jakarta.validation.Constraint;
 
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = PriorityValidator.class)
+@Constraint(validatedBy = StatusValidator.class)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidPriority {
-    String message() default "Invalid Priority";
+public @interface ValidStatus {
+    String message() default "Invalid Status";
 
     Class<?>[] groups() default {};
 

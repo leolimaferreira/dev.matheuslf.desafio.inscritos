@@ -19,3 +19,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+gestao:
+  projetos:
+   api:
+    security:
+      secret: ${GESTAO_PROJETOS_API_SECURITY_SECRET}
