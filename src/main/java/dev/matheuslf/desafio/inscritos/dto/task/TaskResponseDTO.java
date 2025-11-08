@@ -13,6 +13,7 @@ public record TaskResponseDTO(
         String description,
         Status status,
         Priority priority,
+        dev.matheuslf.desafio.inscritos.dto.user.UserResponseDTO assignee,
         LocalDate dueDate,
         ProjectResponseDTO project
 ) {

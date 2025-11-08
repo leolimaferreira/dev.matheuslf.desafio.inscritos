@@ -6,6 +6,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record UpdateTaskDTO(
         @Size(min = 5, max = 150, message = "Title cannot be shorter than 5 characters or longer than 150 characters.")
@@ -17,6 +18,7 @@ public record UpdateTaskDTO(
         @ValidPriority
         String priority,
         @FutureOrPresent(message = "Due date must be in the present or future.")
-        LocalDate dueDate
+        LocalDate dueDate,
+        UUID assigneeId
 ) {
 }

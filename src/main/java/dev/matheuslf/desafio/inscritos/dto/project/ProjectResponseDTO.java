@@ -8,6 +8,7 @@ public record ProjectResponseDTO(
         String name,
         String description,
         LocalDate startDate,
-        LocalDate endDate
+        LocalDate endDate,
+        dev.matheuslf.desafio.inscritos.dto.user.UserResponseDTO owner
 ) {
 }

@@ -4,10 +4,18 @@ import dev.matheuslf.desafio.inscritos.dto.project.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.UpdateProjectDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
+import dev.matheuslf.desafio.inscritos.entities.User;
+import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
+import dev.matheuslf.desafio.inscritos.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ProjectMapper {
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public ProjectResponseDTO toDTO(Project project) {
         return new ProjectResponseDTO(
@@ -15,17 +23,20 @@ public class ProjectMapper {
                 project.getName(),
                 project.getDescription(),
                 project.getStartDate(),
-                project.getEndDate()
+                project.getEndDate(),
+                userMapper.toDTO(project.getOwner())
         );
     }
 
     public Project toEntity(ProjectRequestDTO dto) {
-        return new Project(
-                dto.name(),
-                dto.description(),
-                dto.startDate(),
-                dto.endDate()
-        );
+        User owner = userRepository.findById(dto.ownerId()).orElseThrow( () -> new NotFoundException("Owner not found"));
+        Project project = new Project();
+        project.setName(dto.name());
+        project.setDescription(dto.description());
+        project.setStartDate(dto.startDate());
+        project.setEndDate(dto.endDate());
+        project.setOwner(owner);
+        return project;
     }
 
     public void updateEntity(Project project, UpdateProjectDTO dto) {
@@ -45,5 +56,9 @@ public class ProjectMapper {
             project.setEndDate(dto.endDate());
         }
 
+        if (dto.ownerId() != null) {
+            User owner = userRepository.findById(dto.ownerId()).orElseThrow( () -> new NotFoundException("Owner not found"));
+            project.setOwner(owner);
+        }
     }
 }

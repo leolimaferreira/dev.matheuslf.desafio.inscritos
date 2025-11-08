@@ -21,6 +21,7 @@ public record TaskRequestDTO(
         String priority,
         @FutureOrPresent(message = "Due date must be in the present or future.")
         LocalDate dueDate,
-        UUID projectId
+        UUID projectId,
+        UUID assigneeId
 ) {
 }

@@ -5,10 +5,12 @@ import dev.matheuslf.desafio.inscritos.dto.task.TaskResponseDTO;
 import dev.matheuslf.desafio.inscritos.dto.task.UpdateTaskDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
 import dev.matheuslf.desafio.inscritos.entities.Task;
+import dev.matheuslf.desafio.inscritos.entities.User;
 import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
 import dev.matheuslf.desafio.inscritos.entities.enums.Status;
 import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
 import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
+import dev.matheuslf.desafio.inscritos.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +20,12 @@ public class TaskMapper {
 
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public Task toEntity(TaskRequestDTO dto) {
         Project project = projectRepository.findById(dto.projectId()).orElseThrow( () -> new NotFoundException("Project not found"));
+        User assignee = userRepository.findById(dto.assigneeId()).orElseThrow( () -> new NotFoundException("Assignee not found"));
         Task task = new Task();
         task.setTitle(dto.title());
         task.setDescription(dto.description());
@@ -28,6 +33,7 @@ public class TaskMapper {
         task.setPriority(Priority.valueOf(dto.priority().toUpperCase()));
         task.setDueDate(dto.dueDate());
         task.setProject(project);
+        task.setAssignee(assignee);
         return task;
     }
 
@@ -38,6 +44,7 @@ public class TaskMapper {
                 task.getDescription(),
                 task.getStatus(),
                 task.getPriority(),
+                userMapper.toDTO(task.getAssignee()),
                 task.getDueDate(),
                 projectMapper.toDTO(task.getProject())
         );
@@ -62,6 +69,11 @@ public class TaskMapper {
 
         if (dto.dueDate() != null) {
             task.setDueDate(dto.dueDate());
+        }
+
+        if (dto.assigneeId() != null) {
+            User assignee = userRepository.findById(dto.assigneeId()).orElseThrow( () -> new NotFoundException("Assignee not found"));
+            task.setAssignee(assignee);
         }
 
     }
