@@ -1,8 +1,8 @@
 ## 🧠 Desafio Técnico – Sistema de Gestão de Projetos e Demandas
 
 ### 📘 Contexto
-Sua missão é desenvolver uma **API RESTful em Java com Spring Boot** para gerenciar **projetos e tarefas (demandas)** de uma empresa.  
-O sistema será utilizado por um time de desenvolvimento para organizar suas entregas, acompanhar o status das tarefas e realizar análises simples.
+Uma **API RESTful em Java com Spring Boot** para gerenciar **projetos e tarefas (demandas)** de uma empresa com **autenticação e autorização JWT**.  
+O sistema é utilizado por um time de desenvolvimento para organizar suas entregas, acompanhar o status das tarefas, realizar análises e gerenciar usuários com diferentes níveis de acesso.
 
 ---
 
@@ -12,38 +12,64 @@ O sistema será utilizado por um time de desenvolvimento para organizar suas ent
 
 A modelagem pode ser modificada pelo inscrito. Porém, precisa ser justificado o motivo.
 
-#### `Project`
+#### `User`
 | Campo | Tipo | Descrição |
 |-------|------|-----------|
-| `id` | UUID/Long | Identificador |
+| `id` | UUID | Identificador único |
 | `name` | String (3–100) | **Obrigatório** |
+| `email` | String | **Obrigatório e único** |
+| `password` | String | **Obrigatório** (hash bcrypt) |
+| `role` | Enum (ADMIN/USER) | **Obrigatório** |
+| `enabled` | Boolean | Status ativo/inativo |
+| `version` | Long | Controle de concorrência (optimistic locking) |
+| `createdAt` | LocalDateTime | Data de criação |
+| `updatedAt` | LocalDateTime | Data de atualização |
+
+#### `Project`
+| Campo         | Tipo | Descrição |
+|---------------|------|-----------|
+| `id`          | UUID | Identificador |
+| `name`        | String (3–100) | **Obrigatório** |
 | `description` | String | Opcional |
-| `startDate` | Date | Início do projeto |
-| `endDate` | Date | Opcional |
+| `startDate`   | Date | Início do projeto |
+| `endDate`     | Date | Opcional |
+| `ownerId`     | FK(User) | Proprietário do projeto |
 
 #### `Task`
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| `id` | UUID/Long | Identificador |
-| `title` | String (5–150) | **Obrigatório** |
+| Campo         | Tipo | Descrição |
+|---------------|------|-----------|
+| `id`          | UUID | Identificador |
+| `title`       | String (5–150) | **Obrigatório** |
 | `description` | String | Detalhes da tarefa |
-| `status` | Enum | TODO / DOING / DONE |
-| `priority` | Enum | LOW / MEDIUM / HIGH |
-| `dueDate` | Date | Data limite |
-| `projectId` | FK(Project) | Relacionamento |
+| `status`      | Enum | TODO / DOING / DONE |
+| `priority`    | Enum | LOW / MEDIUM / HIGH |
+| `dueDate`     | Date | Data limite |
+| `projectId`   | FK(Project) | Projeto associado |
+| `assigneeId`  | FK(User) | Usuário responsável |
 
 ---
 
 ### 🌐 2. Endpoints REST
 
+#### Autenticação e Usuários
+| Método | Endpoint | Descrição                                  |
+|---------|----------|--------------------------------------------|
+| **POST** | `/auth/login` | Autenticar usuário (retorna JWT token)     |
+| **POST** | `/users` | Registrar novo usuário (retorna JWT token) |
+
+#### Projetos
 | Método | Endpoint | Descrição |
 |---------|-----------|-----------|
 | **POST** | `/projects` | Criar novo projeto (`name` obrigatório) |
 | **GET** | `/projects` | Listar todos os projetos (paginação) |
 | **PUT** | `/projects/{id}` | Atualizar projeto (apenas campos não nulos) |
 | **DELETE** | `/projects/{id}` | Deletar projeto (com validações) |
+
+#### Tarefas
+| Método | Endpoint | Descrição |
+|---------|-----------|-----------|
 | **POST** | `/tasks` | Criar nova tarefa vinculada a um projeto |
-| **GET** | `/tasks?status=&priority=&projectId=` | Buscar tarefas com filtros opcionais |
+| **GET** | `/tasks` | Buscar tarefas com filtros opcionais |
 | **PUT** | `/tasks/{id}` | Atualizar tarefa (apenas campos não nulos) |
 | **PUT** | `/tasks/{id}/status` | Atualizar apenas o status da tarefa |
 | **DELETE** | `/tasks/{id}` | Remover tarefa |
@@ -59,6 +85,7 @@ A modelagem pode ser modificada pelo inscrito. Porém, precisa ser justificado o
 - ✅ Não permitir criar projeto com `startDate` no passado
 - ✅ Comprimento mínimo e máximo de `name` (3-100 caracteres)
 - ✅ Descrição obrigatória
+- ✅ Apenas ADMIN pode criar/editar/deletar projetos
 
 ### 📝 Validações de Tarefa
 - ✅ Não permitir criar tarefa sem projeto válido
@@ -71,12 +98,24 @@ A modelagem pode ser modificada pelo inscrito. Porém, precisa ser justificado o
 - ✅ Validar limite máximo de tarefas HIGH por projeto (máximo 5)
 - ✅ Apenas tarefas em status TODO podem ser movidas para DOING
 - ✅ Apenas tarefas em status DOING podem ser movidas para DONE
+- ✅ Apenas ADMIN pode criar/editar/deletar tarefas
+- ✅ USER comum pode apenas visualizar tarefas
+
+### 🔐 Validações de Autenticação e Autorização
+- ✅ Autenticação via JWT (Token Bearer)
+- ✅ Registro de novo usuário com hash bcrypt
+- ✅ Controle de acesso baseado em roles (ADMIN/USER)
+- ✅ Validação de token em todas as requisições protegidas
+- ✅ Detecção automática de usuário autenticado via `@AuthenticationPrincipal`
+- ✅ Proteção contra acesso não autorizado (403 Forbidden)
 
 ### 🎯 Tratamento de Erros
 - ✅ Erros de validação retornam **400 Bad Request** com detalhes dos campos
 - ✅ Recursos não encontrados retornam **404 Not Found**
 - ✅ Conflitos de negócio retornam **409 Conflict**
 - ✅ Operações não suportadas retornam **405 Method Not Allowed**
+- ✅ Acesso não autorizado retorna **403 Forbidden**
+- ✅ Falha na autenticação retorna **401 Unauthorized**
 
 ---
 
@@ -100,6 +139,13 @@ A modelagem pode ser modificada pelo inscrito. Porém, precisa ser justificado o
 src/
 ├── main/java/dev/matheuslf/desafio/inscritos/
 │   ├── InscritosApplication.java          
+│   ├── config/
+│   │   ├── EncoderConfig.java
+│   │   └── SecurityConfig.java
+│   ├── security/
+│   │   ├── CustomUserDetailsService.java
+│   │   ├── SecurityFilter.java
+│   │   └── TokenService.java
 │   ├── controller/
 │   │   ├── GenericController.java
 │   │   ├── annotation/                  
@@ -107,8 +153,12 @@ src/
 │   │   │   └── ValidStatus.java
 │   │   └── impl/
 │   │       ├── ProjectController.java
-│   │       └── TaskController.java
+│   │       ├── TaskController.java
+│   │       └── AuthController.java
 │   ├── dto/
+│   │   ├── login/
+│   │   │   ├── LoginRequestDTO.java
+│   │   │   └── TokenResponseDTO.java
 │   │   ├── error/                         
 │   │   │   ├── FieldError.java
 │   │   │   └── ResponseError.java
@@ -116,16 +166,22 @@ src/
 │   │   │   ├── ProjectRequestDTO.java
 │   │   │   ├── ProjectResponseDTO.java
 │   │   │   └── UpdateProjectDTO.java
-│   │   └── task/
-│   │       ├── TaskRequestDTO.java
-│   │       ├── TaskResponseDTO.java
-│   │       └── UpdateTaskDTO.java
+│   │   ├── task/
+│   │   │   ├── TaskRequestDTO.java
+│   │   │   ├── TaskResponseDTO.java
+│   │   │   └── UpdateTaskDTO.java
+│   │   └── user/
+│   │       ├── UserRequestDTO.java
+│   │       ├── UserResponseDTO.java
+│   │       └── UserDTO.java
 │   ├── entities/                          
 │   │   ├── Project.java
 │   │   ├── Task.java
+│   │   ├── User.java
 │   │   └── enums/
 │   │       ├── Priority.java
-│   │       └── Status.java
+│   │       ├── Status.java
+│   │       └── Role.java
 │   ├── exception/                         
 │   │   ├── ConflictException.java
 │   │   ├── DescriptionNeededException.java
@@ -141,15 +197,18 @@ src/
 │   │       └── GlobalExceptionHandler.java
 │   ├── mapper/                           
 │   │   ├── ProjectMapper.java
-│   │   └── TaskMapper.java
+│   │   ├── TaskMapper.java
+│   │   └── UserMapper.java
 │   ├── repository/                       
 │   │   ├── ProjectRepository.java
 │   │   ├── TaskRepository.java
+│   │   ├── UserRepository.java
 │   │   └── specs/
 │   │       └── TaskSpecs.java
 │   ├── service/                           
 │   │   ├── ProjectService.java
-│   │   └── TaskService.java
+│   │   ├── TaskService.java
+│   │   └── AuthService.java
 │   └── validator/                        
 │       ├── PriorityValidator.java
 │       ├── ProjectValidator.java
@@ -181,8 +240,18 @@ src/
 2. **Configure o banco de dados**
    - Crie um banco PostgreSQL chamado `desafio_inscritos`
    - Atualize as credenciais em `src/main/resources/application.yml` se necessário
+   - Execute o script SQL para criar as tabelas (ou use Flyway/Liquibase)
 
-3. **Execute a aplicação**
+3. **Configure o Token JWT**
+   - Defina a chave secreta JWT em `application.yml`:
+     ```yml
+     app:
+       api:
+        security:
+         secret: sua-chave-secreta-muito-segura
+     ```
+
+4. **Execute a aplicação**
    ```bash
    # Com Maven
    ./mvnw spring-boot:run
@@ -191,7 +260,7 @@ src/
    # Execute a classe InscritosApplication.java
    ```
 
-4. **A API estará disponível em**
+5. **A API estará disponível em**
    ```
    http://localhost:8080
    ```
@@ -213,6 +282,15 @@ src/
 
 ## 🏅 Funcionalidades Implementadas
 
+### Autenticação e Usuários
+- ✅ Autenticação com JWT (Token Bearer)
+- ✅ Registro de novo usuário com hash bcrypt
+- ✅ Controle de acesso baseado em roles (ADMIN/USER)
+- ✅ Validação de token em todas as requisições protegidas
+- ✅ Detecção automática de usuário autenticado via `@AuthenticationPrincipal`
+- ✅ Sistema de segurança com SecurityFilter customizado
+- ✅ UserDetailsService integrado com banco de dados
+
 ### Projetos
 - ✅ CRUD completo com validações
 - ✅ Atualização parcial (apenas campos não nulos)
@@ -220,6 +298,7 @@ src/
 - ✅ Validações de datas (startDate no passado, endDate)
 - ✅ Unicidade de nome
 - ✅ Proteção contra deleção com tarefas ativas
+- ✅ Relacionamento com User (proprietário/owner)
 
 ### Tarefas
 - ✅ CRUD completo com validações complexas
@@ -229,6 +308,7 @@ src/
 - ✅ Limite de tarefas HIGH por projeto
 - ✅ Validações de datas (dueDate, comparação com projeto)
 - ✅ Descrição obrigatória para prioridade HIGH
+- ✅ Atribuição de usuário responsável (assignee)
 
 ---
 
@@ -243,6 +323,9 @@ src/
 ---
 
 ## 🏅 Diferenciais Implementados
+- ✅ **Autenticação JWT** com SecurityFilter customizado
+- ✅ **Sistema de Roles** (ADMIN/USER) com autorização granular
+- ✅ **Controle de Concorrência** com optimistic locking (@Version)
 - ✅ **JaCoCo** para relatório de cobertura de testes
 - ✅ **Spring Data JPA Specifications** para queries dinâmicas e reutilizáveis
 - ✅ **Anotações customizadas** para validação de enums
@@ -252,6 +335,9 @@ src/
 - ✅ **Testes unitários** com MockMvc e Mockito
 - ✅ **Validação em múltiplas camadas** (Controller, Service, Validator)
 - ✅ **Paginação** implementada nos endpoints GET
+- ✅ **UserDetailsService customizado** integrado com JPA
+- ✅ **Password encoding** com BCrypt
+- ✅ **Atualização parcial de entidades** com suporte a campos nulos
 
 ---
 
@@ -284,9 +370,45 @@ O relatório mostra cobertura de classes, métodos, linhas de código e branches
 
 ## 📝 Exemplos de Uso
 
+### Registrar um Novo Usuário
+```json
+POST /auth/register
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "password": "senha123",
+  "role": "USER"
+}
+```
+
+### Autenticar Usuário
+```json
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@example.com",
+  "password": "senha123"
+}
+
+Response:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Obter Dados do Usuário Autenticado
+```bash
+GET /auth/me
+Authorization: Bearer <seu-token-jwt>
+```
+
 ### Criar um Projeto
 ```json
 POST /projects
+Authorization: Bearer <seu-token-jwt>
 Content-Type: application/json
 
 {
@@ -300,6 +422,7 @@ Content-Type: application/json
 ### Criar uma Tarefa
 ```json
 POST /tasks
+Authorization: Bearer <seu-token-jwt>
 Content-Type: application/json
 
 {
@@ -314,6 +437,7 @@ Content-Type: application/json
 ### Atualizar Tarefa (Parcial)
 ```json
 PUT /tasks/{id}
+Authorization: Bearer <seu-token-jwt>
 Content-Type: application/json
 
 {
@@ -331,6 +455,11 @@ Content-Type: application/json
 - Valide as credenciais em `application.yml`
 - Confirme que o banco `desafio_inscritos` foi criado
 
+### Erro 403 Forbidden ao autenticar
+- Verifique se está enviando o token com prefixo `Bearer ` no header `Authorization`
+- Confirme se o usuário tem a role `ADMIN` (para criar/editar projetos)
+- Decodifique o JWT em `jwt.io` para verificar se as claims estão corretas
+
 ### Erro de Lazy Loading
 Se receber erro de Hibernate proxy ao serializar:
 - Verifique as configurações de `@JsonIgnore` nas DTOs
@@ -339,6 +468,13 @@ Se receber erro de Hibernate proxy ao serializar:
 ### Testes falhando
 - Execute `./mvnw clean test` para limpar build anterior
 - Verifique se todas as dependências foram instaladas
+- Confirme que o arquivo de configuração de testes está correto
+
+### Erro de Optimistic Locking
+Se receber `ObjectOptimisticLockingFailureException`:
+- Certifique-se que o campo `@Version` está na entidade
+- Adicione a coluna `version` ao banco de dados
+- Não tente fazer updates simultâneos do mesmo registro
 
 ---
 
