@@ -3,6 +3,7 @@ package dev.matheuslf.desafio.inscritos.validator;
 import dev.matheuslf.desafio.inscritos.entities.Project;
 import dev.matheuslf.desafio.inscritos.entities.Task;
 import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
+import dev.matheuslf.desafio.inscritos.entities.enums.Status;
 import dev.matheuslf.desafio.inscritos.exception.ConflictException;
 import dev.matheuslf.desafio.inscritos.exception.DescriptionNeededException;
 import dev.matheuslf.desafio.inscritos.exception.InvalidTaskDueDateException;
@@ -57,6 +58,16 @@ public class TaskValidator {
     public void validateTaskName(Task task) {
         if (existsRegisteredTask(task)) {
             throw new ConflictException("There is already a task with this name in this project.");
+        }
+    }
+
+    public void validateStatusChange(Status updateStatus, Status taskStatus) {
+        if (updateStatus == Status.DONE && taskStatus != Status.DOING) {
+            throw new ConflictException("You can only change the status of a task to DONE if it is in status DOING.");
+        }
+
+        if (updateStatus == Status.DOING && taskStatus != Status.TODO) {
+            throw new ConflictException("You can only change the status of a task to DOING if it is in status TODO.");
         }
     }
 

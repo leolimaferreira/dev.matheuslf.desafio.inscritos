@@ -99,6 +99,13 @@ public class GlobalExceptionHandler{
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
     }
 
+    @ExceptionHandler(InvalidStatusChangeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleInvalidStatusChangeException(InvalidStatusChangeException e) {
+        log.error("Invalid status change in task: {}", e.getMessage());
+        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseError handleGenericException() {
