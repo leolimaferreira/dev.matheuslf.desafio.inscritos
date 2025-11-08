@@ -92,6 +92,13 @@ public class GlobalExceptionHandler{
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), message, List.of());
     }
 
+    @ExceptionHandler(InvalidTimeExpendedWithTaskException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleInvalidTimeExpendedWithTaskException(InvalidTimeExpendedWithTaskException e) {
+        log.error("Invalid time expended with task: {}", e.getMessage());
+        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseError handleGenericException() {

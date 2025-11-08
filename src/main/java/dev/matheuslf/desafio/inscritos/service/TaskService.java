@@ -46,7 +46,8 @@ public class TaskService {
 
     public TaskResponseDTO updateTask(UUID id, UpdateTaskDTO dto) {
         Task task = taskRepository.findById(id).orElseThrow( () -> new RuntimeException("Task not found"));
-        boolean priorityHigh = dto.priority().equals(Priority.HIGH.toString());
+        boolean priorityHigh = dto.priority() != null && dto.priority().equals(Priority.HIGH.toString());
+        boolean statusDone = dto.status() != null && dto.status().equals(Status.DONE.toString());
 
         taskValidator.validateProjectEndDate(task.getProject());
         taskValidator.validateTaskDueDate(task.getDueDate(), task.getProject());
@@ -54,6 +55,10 @@ public class TaskService {
         if (priorityHigh) {
             taskValidator.validateNumberOfHighTasks(task.getProject());
             taskValidator.validateDescription(dto.description());
+        }
+
+        if (statusDone) {
+            taskValidator.validateTimeExpendedWithTask(task.getUpdatedAt());
         }
 
         taskMapper.updateEntity(task, dto);

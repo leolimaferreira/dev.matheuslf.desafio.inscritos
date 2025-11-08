@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -41,6 +42,12 @@ public class TaskValidator {
 
         if (taskDueDate.isBefore(project.getStartDate())) {
             throw new InvalidTaskDueDateException("Task due date cannot be before project start date");
+        }
+    }
+
+    public void validateTimeExpendedWithTask(LocalDateTime taskLastUpdate) {
+        if (taskLastUpdate.plusMinutes(30).isAfter(LocalDateTime.now())) {
+            throw new DescriptionNeededException("You cannot update a task to DONE less than 30 minutes after its creation");
         }
     }
 }
