@@ -32,6 +32,7 @@ public class TaskService {
         boolean priorityHigh = dto.priority().equals(Priority.HIGH.toString());
         Task task = taskMapper.toEntity(dto);
 
+        taskValidator.validateTaskName(task);
         taskValidator.validateProjectEndDate(task.getProject());
         taskValidator.validateTaskDueDate(task.getDueDate(), task.getProject());
 
@@ -49,6 +50,7 @@ public class TaskService {
         boolean priorityHigh = dto.priority() != null && dto.priority().equals(Priority.HIGH.toString());
         boolean statusDone = dto.status() != null && dto.status().equals(Status.DONE.toString());
 
+        taskValidator.validateTaskName(task);
         taskValidator.validateProjectEndDate(task.getProject());
         taskValidator.validateTaskDueDate(task.getDueDate(), task.getProject());
 
