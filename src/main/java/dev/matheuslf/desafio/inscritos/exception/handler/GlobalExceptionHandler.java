@@ -116,6 +116,20 @@ public class GlobalExceptionHandler{
         return new ResponseError(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), List.of());
     }
 
+    @ExceptionHandler(ExpiredRecoveryTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseError handleExpiredRecoveryTokenException(ExpiredRecoveryTokenException e) {
+        log.error("Error while validating recovery token: {}", e.getMessage());
+        return new ResponseError(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(SamePasswordException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleSamePasswordException(SamePasswordException e) {
+        log.error("Error while changing password: {}", e.getMessage());
+        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
+    }
+
     @ExceptionHandler(JWTCreationException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseError handleJWTCreationException(JWTCreationException e) {

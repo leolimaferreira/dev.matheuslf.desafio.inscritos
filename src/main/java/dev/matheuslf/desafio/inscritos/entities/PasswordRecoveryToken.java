@@ -22,4 +22,6 @@ public class PasswordRecoveryToken {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    private boolean used = false;
 }

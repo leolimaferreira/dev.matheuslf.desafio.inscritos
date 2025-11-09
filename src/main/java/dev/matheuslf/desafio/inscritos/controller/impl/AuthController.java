@@ -3,9 +3,11 @@ package dev.matheuslf.desafio.inscritos.controller.impl;
 import dev.matheuslf.desafio.inscritos.controller.GenericController;
 import dev.matheuslf.desafio.inscritos.dto.login.LoginRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.login.LoginResponseDTO;
+import dev.matheuslf.desafio.inscritos.dto.recovery.ChangePasswordDTO;
 import dev.matheuslf.desafio.inscritos.dto.recovery.RecoveryRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.recovery.RecoveryResponseDTO;
 import dev.matheuslf.desafio.inscritos.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -30,5 +32,11 @@ public class AuthController implements GenericController {
     @PostMapping("/generate-recovery-token")
     public ResponseEntity<RecoveryResponseDTO> generateRecoveryToken(@RequestBody RecoveryRequestDTO dto) {
         return ResponseEntity.ok(authService.generateRecoveryToken(dto));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordDTO dto) {
+        authService.changePassword(dto);
+        return ResponseEntity.noContent().build();
     }
 }
