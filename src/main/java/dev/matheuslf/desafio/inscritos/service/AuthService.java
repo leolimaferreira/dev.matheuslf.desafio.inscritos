@@ -2,8 +2,13 @@ package dev.matheuslf.desafio.inscritos.service;
 
 import dev.matheuslf.desafio.inscritos.dto.login.LoginRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.login.LoginResponseDTO;
+import dev.matheuslf.desafio.inscritos.dto.recovery.RecoveryRequestDTO;
+import dev.matheuslf.desafio.inscritos.dto.recovery.RecoveryResponseDTO;
+import dev.matheuslf.desafio.inscritos.entities.PasswordRecoveryToken;
 import dev.matheuslf.desafio.inscritos.entities.User;
 import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
+import dev.matheuslf.desafio.inscritos.mapper.PasswordRecoveryTokenMapper;
+import dev.matheuslf.desafio.inscritos.repository.PasswordRecoveryTokenRepository;
 import dev.matheuslf.desafio.inscritos.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.security.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +22,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AuthService {
 
-    public final UserRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final PasswordRecoveryTokenRepository passwordRecoveryTokenRepository;
+    private final PasswordRecoveryTokenMapper passwordRecoveryTokenMapper;
 
     public LoginResponseDTO login(LoginRequestDTO dto) {
         log.info("Login request received with email: {}", dto.email());
@@ -43,5 +50,13 @@ public class AuthService {
         log.info("Token generated successfully for user: {}", dto.email());
 
         return new LoginResponseDTO(token, user.getName());
+    }
+
+    public RecoveryResponseDTO generateRecoveryToken(RecoveryRequestDTO dto) {
+        User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new NotFoundException("User not found with email"));
+        PasswordRecoveryToken recoveryToken = new PasswordRecoveryToken();
+        recoveryToken.setUser(user);
+        PasswordRecoveryToken savedToken = passwordRecoveryTokenRepository.save(recoveryToken);
+        return passwordRecoveryTokenMapper.toDTO(savedToken);
     }
 }
