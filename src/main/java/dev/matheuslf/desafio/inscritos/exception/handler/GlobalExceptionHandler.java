@@ -123,10 +123,31 @@ public class GlobalExceptionHandler{
         return new ResponseError(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), List.of());
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseError handleUnauthorizedException(UnauthorizedException e) {
+        log.error("Error while doing user authorities verification: {}", e.getMessage());
+        return new ResponseError(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), List.of());
+    }
+
     @ExceptionHandler(SamePasswordException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handleSamePasswordException(SamePasswordException e) {
         log.error("Error while changing password: {}", e.getMessage());
+        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(ProjectAlreadyStartedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleProjectAlreadyStartedException(ProjectAlreadyStartedException e) {
+        log.error("Error while updating project: {}", e.getMessage());
+        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(InvalidProjectDatesException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleInvalidProjectDatesException(InvalidProjectDatesException e) {
+        log.error("Error while updating project dates: {}", e.getMessage());
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
     }
 

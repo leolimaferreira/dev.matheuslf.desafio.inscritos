@@ -1,16 +1,17 @@
 package dev.matheuslf.desafio.inscritos.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.UpdateProjectDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
-import dev.matheuslf.desafio.inscritos.exception.ConflictException;
-import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
-import dev.matheuslf.desafio.inscritos.exception.ProjectWithActiveTasksException;
+import dev.matheuslf.desafio.inscritos.exception.*;
 import dev.matheuslf.desafio.inscritos.mapper.ProjectMapper;
 import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
 import dev.matheuslf.desafio.inscritos.validator.ProjectValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -54,16 +56,21 @@ public class ProjectService {
         projectMapper.toDTO(project);
     }
 
-    public ProjectResponseDTO updateProject(UUID id, UpdateProjectDTO dto) {
+    public ProjectResponseDTO updateProject(String token, UUID id, UpdateProjectDTO dto) {
         Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException("Project not found"));
+
+        DecodedJWT decodedToken = JWT.decode(token);
+        boolean isOwner = decodedToken.getSubject().equals(project.getOwner().getId().toString());
+        boolean isAdmin = decodedToken.getClaim("role").asString().equals("ADMIN");
+
+        if (!(isOwner || isAdmin)) {
+            throw new UnauthorizedException("You are not allowed to update this project.");
+        }
+
         projectValidator.validate(project);
 
         if (project.getStartDate().isBefore(LocalDate.now())) {
-            throw new ConflictException("You cannot update a project that has been already started.");
-        }
-
-        if (project.getEndDate().isBefore(dto.startDate()) || dto.endDate().isBefore(project.getStartDate())) {
-            throw new ConflictException("Project's start date must be before the end date.");
+            throw new ProjectAlreadyStartedException("You cannot update a project that has been already started.");
         }
 
         projectMapper.updateEntity(project, dto);

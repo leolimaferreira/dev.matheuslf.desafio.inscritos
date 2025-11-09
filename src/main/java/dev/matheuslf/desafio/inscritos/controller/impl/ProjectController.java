@@ -34,8 +34,14 @@ public class ProjectController implements GenericController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectResponseDTO> update(@PathVariable(value = "id") UUID id, @RequestBody @Valid UpdateProjectDTO dto) {
-        return ResponseEntity.ok(projectService.updateProject(id, dto));
+    public ResponseEntity<ProjectResponseDTO> update(
+            @RequestHeader(value = "Authorization")
+            String token,
+            @PathVariable(value = "id")
+            UUID id,
+            @RequestBody @Valid
+            UpdateProjectDTO dto) {
+        return ResponseEntity.ok(projectService.updateProject(token, id, dto));
     }
 
     @DeleteMapping("/{id}")
