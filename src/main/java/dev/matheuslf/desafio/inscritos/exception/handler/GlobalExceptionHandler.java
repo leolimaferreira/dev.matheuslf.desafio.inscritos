@@ -5,6 +5,7 @@ import dev.matheuslf.desafio.inscritos.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -104,6 +105,13 @@ public class GlobalExceptionHandler{
     public ResponseError handleInvalidStatusChangeException(InvalidStatusChangeException e) {
         log.error("Invalid status change in task: {}", e.getMessage());
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseError handleBadCredentialsException(BadCredentialsException e) {
+        log.error("Authentication failed: {}", e.getMessage());
+        return new ResponseError(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), List.of());
     }
 
     @ExceptionHandler(Exception.class)
