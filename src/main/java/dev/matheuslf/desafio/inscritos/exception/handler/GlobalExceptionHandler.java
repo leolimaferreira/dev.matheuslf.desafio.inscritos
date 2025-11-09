@@ -1,5 +1,7 @@
 package dev.matheuslf.desafio.inscritos.exception.handler;
 
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import dev.matheuslf.desafio.inscritos.dto.error.ResponseError;
 import dev.matheuslf.desafio.inscritos.exception.*;
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +114,20 @@ public class GlobalExceptionHandler{
     public ResponseError handleBadCredentialsException(BadCredentialsException e) {
         log.error("Authentication failed: {}", e.getMessage());
         return new ResponseError(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(JWTCreationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseError handleJWTCreationException(JWTCreationException e) {
+        log.error("Error while authenticating: {}", e.getMessage());
+        return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(JWTVerificationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseError handleJWTVerificationException(JWTVerificationException e) {
+        log.error("Error while doing the JWT verification: {}", e.getMessage());
+        return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), List.of());
     }
 
     @ExceptionHandler(Exception.class)
