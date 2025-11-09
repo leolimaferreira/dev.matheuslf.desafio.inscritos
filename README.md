@@ -56,6 +56,8 @@ A modelagem pode ser modificada pelo inscrito. Porém, precisa ser justificado o
 |---------|----------|--------------------------------------------|
 | **POST** | `/auth/login` | Autenticar usuário (retorna JWT token)     |
 | **POST** | `/users` | Registrar novo usuário (retorna JWT token) |
+| **POST** | `/auth/generate-recovery-token` | Gerar token de recuperação de senha |
+| **POST** | `/auth/change-password` | Alterar senha com token de recuperação |
 
 #### Projetos
 | Método | Endpoint | Descrição |
@@ -396,6 +398,32 @@ Content-Type: application/json
 Response:
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Gerar Token de Recuperação de Senha
+```json
+POST /auth/generate-recovery-token
+Content-Type: application/json
+
+{
+  "email": "joao@example.com"
+}
+
+Response:
+{
+  "token": "token-de-recuperacao-xyz..."
+}
+```
+
+### Alterar Senha com Token de Recuperação
+```json
+POST /auth/change-password
+Content-Type: application/json
+
+{
+  "token": "token-de-recuperacao-xyz...",
+  "newPassword": "novaSenha123"
 }
 ```
 
