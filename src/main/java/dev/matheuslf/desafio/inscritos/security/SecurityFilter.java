@@ -36,27 +36,30 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(request);
         log.info("DEBUG: Token recovered: {}", token != null ? "TOKEN_EXISTS" : "NO_TOKEN");
 
-        var login = tokenService.validateToken(token);
-        log.info("DEBUG: Login from token: {}", (Object) login);
+        if (token != null) {
+            var login = tokenService.validateToken(token);
+            log.info("DEBUG: Login from token: {}", login);
 
-        if (login != null) {
-            User user = userRepository.findById(UUID.fromString(login))
-                    .orElseThrow(() -> new NotFoundException("User not found with ID: " + login));
+            if (login != null) {
+                User user = userRepository.findById(UUID.fromString(login))
+                        .orElseThrow(() -> new NotFoundException("User not found with ID: " + login));
 
-            assert token != null;
-            String role = JWT.decode(token).getClaim("role").asString();
+                assert token != null;
+                String role = JWT.decode(token).getClaim("role").asString();
 
-            log.info("DEBUG: User from DB - Email: {}, Role: {}", user.getEmail(), user.getRole());
-            log.info("DEBUG: Role from token: {}", role);
+                log.info("DEBUG: User from DB - Email: {}, Role: {}", user.getEmail(), user.getRole());
+                log.info("DEBUG: Role from token: {}", role);
 
-            var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
-            log.info("DEBUG: Authorities created: {}", authorities);
+                var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+                log.info("DEBUG: Authorities created: {}", authorities);
 
-            var authentication = new UsernamePasswordAuthenticationToken(user.getId().toString(), null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                var authentication = new UsernamePasswordAuthenticationToken(user.getId().toString(), null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            log.info("DEBUG: Authentication set with ID as principal: {}", user.getId());
+                log.info("DEBUG: Authentication set with ID as principal: {}", user.getId());
+            }
         }
+
         filterChain.doFilter(request, response);
     }
 
