@@ -22,4 +22,12 @@ jobs:
         run: mvn clean install -DskipTests
 
       - name: Run tests
-        run: mvn clean test
+        run: mvn test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: always()
+
+      - name: Notify on failure
+        if: failure()
+        run: echo "Build failed! Check the logs for more information."
