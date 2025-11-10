@@ -24,10 +24,6 @@ public class InscritosApplication {
         } catch (Exception e) {
             log.error("Error while running application: {}", e.getMessage());
         }
-        log.info("DATASOURCE_URL = {}", System.getenv("DATASOURCE_URL"));
-        log.info("DATASOURCE_USERNAME = {}", System.getenv("DATASOURCE_USERNAME"));
-        log.info("DATASOURCE_PASSWORD = {}", System.getenv("DATASOURCE_PASSWORD"));
-        log.info("GESTAO_PROJETOS_API_SECURITY_SECRET = {}", System.getenv("GESTAO_PROJETOS_API_SECURITY_SECRET"));
     }
 
 }
