@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,6 +32,11 @@ public class ProjectController implements GenericController {
                                                             @RequestParam(value = "size", defaultValue = "10")
                                                             Integer size) {
         return ResponseEntity.ok(projectService.findAllProjects(page, size));
+    }
+
+    @GetMapping("/{ownerId}")
+    public ResponseEntity<List<ProjectResponseDTO>> findByOwner(@PathVariable(value = "ownerId") UUID ownerId) {
+        return ResponseEntity.ok(projectService.findProjectsByOwner(ownerId));
     }
 
     @PutMapping("/{id}")

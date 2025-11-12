@@ -5,7 +5,6 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public record UpdateProjectDTO(
         @Size(min = 3, max = 100, message = "Name cannot be shorter than 3 characters or longer than 100 characters.")
@@ -16,6 +15,6 @@ public record UpdateProjectDTO(
         LocalDate startDate,
         @Future(message = "End date must be in the future")
         LocalDate endDate,
-        UUID ownerId
+        String ownerEmail
 ) {
 }

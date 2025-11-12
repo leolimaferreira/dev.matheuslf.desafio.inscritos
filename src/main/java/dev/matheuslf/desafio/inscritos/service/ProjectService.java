@@ -6,9 +6,11 @@ import dev.matheuslf.desafio.inscritos.dto.project.ProjectRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.ProjectResponseDTO;
 import dev.matheuslf.desafio.inscritos.dto.project.UpdateProjectDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
+import dev.matheuslf.desafio.inscritos.entities.User;
 import dev.matheuslf.desafio.inscritos.exception.*;
 import dev.matheuslf.desafio.inscritos.mapper.ProjectMapper;
 import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
+import dev.matheuslf.desafio.inscritos.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.validator.ProjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,6 +31,7 @@ public class ProjectService {
     private final ProjectMapper projectMapper;
     private final TaskService taskService;
     private final ProjectValidator projectValidator;
+    private final UserRepository userRepository;
 
     public ProjectResponseDTO saveProject(ProjectRequestDTO dto) {
         Project project = projectMapper.toEntity(dto);
@@ -78,4 +82,11 @@ public class ProjectService {
         return projectMapper.toDTO(updatedProject);
     }
 
+    public List<ProjectResponseDTO> findProjectsByOwner(UUID ownerId) {
+        User owner = userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException("Owner not found"));
+        return projectRepository.findByOwner(owner)
+                .stream()
+                .map(projectMapper::toDTO)
+                .toList();
+    }
 }
