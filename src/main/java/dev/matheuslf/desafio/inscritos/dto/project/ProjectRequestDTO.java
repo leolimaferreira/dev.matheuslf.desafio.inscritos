@@ -1,9 +1,11 @@
 package dev.matheuslf.desafio.inscritos.dto.project;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public record ProjectRequestDTO(
         @NotBlank
@@ -15,6 +17,6 @@ public record ProjectRequestDTO(
         LocalDate startDate,
         @Future(message = "End date must be in the future")
         LocalDate endDate,
-        UUID ownerId
+        String ownerEmail
 ) {
 }

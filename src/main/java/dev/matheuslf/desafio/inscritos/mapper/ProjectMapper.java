@@ -30,7 +30,7 @@ public class ProjectMapper {
     }
 
     public Project toEntity(ProjectRequestDTO dto) {
-        User owner = userRepository.findById(dto.ownerId()).orElseThrow( () -> new NotFoundException("Owner not found"));
+        User owner = userRepository.findByEmail(dto.ownerEmail()).orElseThrow( () -> new NotFoundException("Owner not found"));
         Project project = new Project();
         project.setName(dto.name());
         project.setDescription(dto.description());
