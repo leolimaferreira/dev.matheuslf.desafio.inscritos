@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,5 +38,9 @@ public class UserService {
         userMapper.updateEntity(user, dto);
         User savedUser = userRepository.save(user);
         return userMapper.toDTO(savedUser);
+    }
+
+    public List<String> findAllEmails() {
+        return userRepository.findAllEmails();
     }
 }

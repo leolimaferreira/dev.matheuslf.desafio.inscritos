@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,6 +26,11 @@ public class UserController implements GenericController {
         UserResponseDTO response = userService.saveUser(dto);
         URI location = generateHeaderLocation(response.id());
         return ResponseEntity.created(location).body(response);
+    }
+
+    @GetMapping("/emails")
+    public ResponseEntity<List<String>> findAllEmails() {
+        return ResponseEntity.ok(userService.findAllEmails());
     }
 
     @PutMapping("/{id}")
