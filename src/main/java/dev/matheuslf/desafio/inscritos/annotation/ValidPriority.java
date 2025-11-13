@@ -1,12 +1,12 @@
 package dev.matheuslf.desafio.inscritos.annotation;
 
-import dev.matheuslf.desafio.inscritos.validator.RoleValidator;
+import dev.matheuslf.desafio.inscritos.validator.PriorityValidator;
 import jakarta.validation.Constraint;
 
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = RoleValidator.class)
+@Constraint(validatedBy = PriorityValidator.class)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPriority {
