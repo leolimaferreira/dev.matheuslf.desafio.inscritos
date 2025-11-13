@@ -2,12 +2,12 @@ package dev.matheuslf.desafio.inscritos.dto.task;
 
 import dev.matheuslf.desafio.inscritos.annotation.ValidPriority;
 import dev.matheuslf.desafio.inscritos.annotation.ValidStatus;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public record TaskRequestDTO(
         @NotBlank
@@ -21,7 +21,12 @@ public record TaskRequestDTO(
         String priority,
         @FutureOrPresent(message = "Due date must be in the present or future.")
         LocalDate dueDate,
-        UUID projectId,
-        UUID assigneeId
+        @NotBlank
+        @Size(min = 3, max = 100, message = "Name cannot be shorter than 3 characters or longer than 100 characters.")
+        String projectName,
+        @NotBlank(message = "Email cannot be blank.")
+        @Email
+        @Size(max = 150, message = "Email cannot be longer than 150 characters.")
+        String assigneeEmail
 ) {
 }

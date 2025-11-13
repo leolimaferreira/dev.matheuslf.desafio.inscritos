@@ -1,9 +1,6 @@
 package dev.matheuslf.desafio.inscritos.dto.project;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -17,6 +14,9 @@ public record ProjectRequestDTO(
         LocalDate startDate,
         @Future(message = "End date must be in the future")
         LocalDate endDate,
+        @NotBlank(message = "Email cannot be blank.")
+        @Email
+        @Size(max = 150, message = "Email cannot be longer than 150 characters.")
         String ownerEmail
 ) {
 }

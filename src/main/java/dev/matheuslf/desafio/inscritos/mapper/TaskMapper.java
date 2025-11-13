@@ -24,8 +24,8 @@ public class TaskMapper {
     private final UserMapper userMapper;
 
     public Task toEntity(TaskRequestDTO dto) {
-        Project project = projectRepository.findById(dto.projectId()).orElseThrow( () -> new NotFoundException("Project not found"));
-        User assignee = userRepository.findById(dto.assigneeId()).orElseThrow( () -> new NotFoundException("Assignee not found"));
+        Project project = projectRepository.findByName(dto.projectName()).orElseThrow( () -> new NotFoundException("Project not found"));
+        User assignee = userRepository.findByEmail(dto.assigneeEmail()).orElseThrow( () -> new NotFoundException("Assignee not found"));
         Task task = new Task();
         task.setTitle(dto.title());
         task.setDescription(dto.description());
