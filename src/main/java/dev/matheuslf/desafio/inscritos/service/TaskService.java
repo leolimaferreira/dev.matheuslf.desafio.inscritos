@@ -8,6 +8,7 @@ import dev.matheuslf.desafio.inscritos.entities.Task;
 import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
 import dev.matheuslf.desafio.inscritos.entities.enums.Status;
 import dev.matheuslf.desafio.inscritos.mapper.TaskMapper;
+import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
 import dev.matheuslf.desafio.inscritos.repository.TaskRepository;
 import dev.matheuslf.desafio.inscritos.validator.TaskValidator;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static dev.matheuslf.desafio.inscritos.repository.specs.TaskSpecs.*;
@@ -27,6 +29,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final TaskValidator taskValidator;
+    private final ProjectRepository projectRepository;
 
     public TaskResponseDTO saveTask(TaskRequestDTO dto) {
         boolean priorityHigh = dto.priority().equals(Priority.HIGH.toString());
@@ -113,5 +116,12 @@ public class TaskService {
 
     public boolean hasDoingTasks(Project project) {
         return taskRepository.existsByProjectAndStatus(project, Status.DOING);
+    }
+
+    public List<TaskResponseDTO> findTasksByProject(UUID projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        return taskRepository.findAllByProject(project).stream()
+                .map(taskMapper::toDTO)
+                .toList();
     }
 }

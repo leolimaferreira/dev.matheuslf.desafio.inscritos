@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,6 +34,11 @@ public class TaskController implements GenericController {
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> update(@PathVariable("id") UUID id, @RequestBody @Valid UpdateTaskDTO dto) {
         return ResponseEntity.ok(taskService.updateTask(id, dto));
+    }
+
+    @GetMapping("project/{projectId}")
+    public ResponseEntity<List<TaskResponseDTO>> findByProject(@PathVariable("projectId") UUID projectId) {
+        return ResponseEntity.ok(taskService.findTasksByProject(projectId));
     }
 
     @GetMapping
