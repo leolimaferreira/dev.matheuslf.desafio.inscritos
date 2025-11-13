@@ -34,9 +34,14 @@ public class ProjectController implements GenericController {
         return ResponseEntity.ok(projectService.findAllProjects(page, size));
     }
 
-    @GetMapping("/{ownerId}")
+    @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<ProjectResponseDTO>> findByOwner(@PathVariable(value = "ownerId") UUID ownerId) {
         return ResponseEntity.ok(projectService.findProjectsByOwner(ownerId));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectResponseDTO> findById(@PathVariable(value = "id") UUID id) {
+        return ResponseEntity.ok(projectService.findProjectById(id));
     }
 
     @PutMapping("/{id}")

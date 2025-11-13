@@ -27,6 +27,7 @@ import java.util.UUID;
 @Slf4j
 public class ProjectService {
 
+    private static final String PROJECT_NOT_FOUND= "Project not found.";
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
     private final TaskService taskService;
@@ -52,7 +53,7 @@ public class ProjectService {
     }
 
     public void deleteProject(UUID id) {
-        Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException("Project not found"));
+        Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException(PROJECT_NOT_FOUND));
         if (taskService.hasDoingTasks(project)) {
             throw new ProjectWithActiveTasksException("There are tasks with status DOING in this project");
         }
@@ -61,7 +62,7 @@ public class ProjectService {
     }
 
     public ProjectResponseDTO updateProject(String token, UUID id, UpdateProjectDTO dto) {
-        Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException("Project not found"));
+        Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException(PROJECT_NOT_FOUND));
 
         DecodedJWT decodedToken = JWT.decode(token);
         boolean isOwner = decodedToken.getSubject().equals(project.getOwner().getId().toString());
@@ -88,5 +89,10 @@ public class ProjectService {
                 .stream()
                 .map(projectMapper::toDTO)
                 .toList();
+    }
+
+    public ProjectResponseDTO findProjectById(UUID id) {
+        Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException(PROJECT_NOT_FOUND));
+        return projectMapper.toDTO(project);
     }
 }
