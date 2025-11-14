@@ -7,6 +7,7 @@ import dev.matheuslf.desafio.inscritos.entities.Project;
 import dev.matheuslf.desafio.inscritos.entities.Task;
 import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
 import dev.matheuslf.desafio.inscritos.entities.enums.Status;
+import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
 import dev.matheuslf.desafio.inscritos.mapper.TaskMapper;
 import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
 import dev.matheuslf.desafio.inscritos.repository.TaskRepository;
@@ -26,6 +27,7 @@ import static dev.matheuslf.desafio.inscritos.repository.specs.TaskSpecs.*;
 @RequiredArgsConstructor
 public class TaskService {
 
+    private static final String TASK_NOT_FOUND_MESSAGE = "Task not found";
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final TaskValidator taskValidator;
@@ -49,7 +51,7 @@ public class TaskService {
     }
 
     public TaskResponseDTO updateTask(UUID id, UpdateTaskDTO dto) {
-        Task task = taskRepository.findById(id).orElseThrow( () -> new RuntimeException("Task not found"));
+        Task task = taskRepository.findById(id).orElseThrow( () -> new NotFoundException(TASK_NOT_FOUND_MESSAGE));
         boolean priorityHigh = dto.priority() != null && dto.priority().equals(Priority.HIGH.toString());
         boolean updateToDone = dto.status() != null && dto.status().equals(Status.DONE.toString());
         boolean updateToDoing = dto.status() != null && dto.status().equals(Status.DOING.toString());
@@ -79,7 +81,7 @@ public class TaskService {
     }
 
     public void deleteTask(UUID id) {
-        Task entity = taskRepository.findById(id).orElseThrow( () -> new RuntimeException("Task not found"));
+        Task entity = taskRepository.findById(id).orElseThrow( () -> new NotFoundException(TASK_NOT_FOUND_MESSAGE));
         taskRepository.delete(entity);
         taskMapper.toDTO(entity);
     }
@@ -119,9 +121,14 @@ public class TaskService {
     }
 
     public List<TaskResponseDTO> findTasksByProject(UUID projectId) {
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("Project not found"));
         return taskRepository.findAllByProject(project).stream()
                 .map(taskMapper::toDTO)
                 .toList();
+    }
+
+    public TaskResponseDTO findTaskById(UUID id) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundException(TASK_NOT_FOUND_MESSAGE));
+        return taskMapper.toDTO(task);
     }
 }
