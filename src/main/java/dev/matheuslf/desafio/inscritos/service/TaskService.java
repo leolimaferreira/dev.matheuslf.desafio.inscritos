@@ -5,12 +5,14 @@ import dev.matheuslf.desafio.inscritos.dto.task.TaskResponseDTO;
 import dev.matheuslf.desafio.inscritos.dto.task.UpdateTaskDTO;
 import dev.matheuslf.desafio.inscritos.entities.Project;
 import dev.matheuslf.desafio.inscritos.entities.Task;
+import dev.matheuslf.desafio.inscritos.entities.User;
 import dev.matheuslf.desafio.inscritos.entities.enums.Priority;
 import dev.matheuslf.desafio.inscritos.entities.enums.Status;
 import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
 import dev.matheuslf.desafio.inscritos.mapper.TaskMapper;
 import dev.matheuslf.desafio.inscritos.repository.ProjectRepository;
 import dev.matheuslf.desafio.inscritos.repository.TaskRepository;
+import dev.matheuslf.desafio.inscritos.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.validator.TaskValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final TaskValidator taskValidator;
     private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
 
     public TaskResponseDTO saveTask(TaskRequestDTO dto) {
         boolean priorityHigh = dto.priority().equals(Priority.HIGH.toString());
@@ -130,5 +133,12 @@ public class TaskService {
     public TaskResponseDTO findTaskById(UUID id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundException(TASK_NOT_FOUND_MESSAGE));
         return taskMapper.toDTO(task);
+    }
+
+    public List<TaskResponseDTO> findTaskByAssignee(UUID assigneeId) {
+        User assignee = userRepository.findById(assigneeId).orElseThrow(() -> new NotFoundException("Assignee not found"));
+        return taskRepository.findAllByAssignee(assignee).stream()
+                .map(taskMapper::toDTO)
+                .toList();
     }
 }

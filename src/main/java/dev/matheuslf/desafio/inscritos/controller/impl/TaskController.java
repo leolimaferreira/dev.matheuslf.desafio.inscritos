@@ -41,6 +41,11 @@ public class TaskController implements GenericController {
         return ResponseEntity.ok(taskService.findTasksByProject(projectId));
     }
 
+    @GetMapping("assignee/{assigneeId}")
+    public ResponseEntity<List<TaskResponseDTO>> findByAssignee(@PathVariable("assigneeId") UUID assigneeId) {
+        return ResponseEntity.ok(taskService.findTaskByAssignee(assigneeId));
+    }
+
     @GetMapping
     public ResponseEntity<Page<TaskResponseDTO>> findWithParams(
             @RequestParam(value = "title", required = false)
