@@ -137,13 +137,6 @@ public class GlobalExceptionHandler{
         return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
     }
 
-    @ExceptionHandler(ProjectAlreadyStartedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseError handleProjectAlreadyStartedException(ProjectAlreadyStartedException e) {
-        log.error("Error while updating project: {}", e.getMessage());
-        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
-    }
-
     @ExceptionHandler(InvalidProjectDatesException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handleInvalidProjectDatesException(InvalidProjectDatesException e) {

@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,10 +72,6 @@ public class ProjectService {
         }
 
         projectValidator.validate(project);
-
-        if (project.getStartDate().isBefore(LocalDate.now())) {
-            throw new ProjectAlreadyStartedException("You cannot update a project that has been already started.");
-        }
 
         projectMapper.updateEntity(project, dto);
         Project updatedProject = projectRepository.save(project);
