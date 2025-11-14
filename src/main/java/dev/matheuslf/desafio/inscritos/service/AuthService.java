@@ -10,6 +10,7 @@ import dev.matheuslf.desafio.inscritos.entities.User;
 import dev.matheuslf.desafio.inscritos.exception.ExpiredRecoveryTokenException;
 import dev.matheuslf.desafio.inscritos.exception.NotFoundException;
 import dev.matheuslf.desafio.inscritos.exception.SamePasswordException;
+import dev.matheuslf.desafio.inscritos.exception.UnauthorizedException;
 import dev.matheuslf.desafio.inscritos.mapper.PasswordRecoveryTokenMapper;
 import dev.matheuslf.desafio.inscritos.repository.PasswordRecoveryTokenRepository;
 import dev.matheuslf.desafio.inscritos.repository.UserRepository;
@@ -20,13 +21,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
 
+    private static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
@@ -38,14 +38,14 @@ public class AuthService {
 
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> {
-                    log.warn("User not found with email: {}", dto.email());
-                    return new NotFoundException("User not found with email: " + dto.email());
+                    log.warn(INVALID_EMAIL_OR_PASSWORD);
+                    return new UnauthorizedException(INVALID_EMAIL_OR_PASSWORD);
                 });
 
         log.info("User found: {}, role: {}", user.getName(), user.getRole());
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
-            log.warn("Invalid password for user: {}", dto.email());
+            log.warn(INVALID_EMAIL_OR_PASSWORD);
             throw new BadCredentialsException("Invalid credentials");
         }
 
