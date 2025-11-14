@@ -59,7 +59,7 @@ public class TaskService {
 
         taskValidator.validateTaskName(task);
         taskValidator.validateProjectEndDate(task.getProject());
-        taskValidator.validateTaskDueDate(task.getDueDate(), task.getProject());
+        taskValidator.validateTaskDueDate(dto.dueDate(), task.getProject());
 
         if (priorityHigh) {
             taskValidator.validateNumberOfHighTasks(task.getProject());

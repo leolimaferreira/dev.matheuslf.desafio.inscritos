@@ -71,8 +71,8 @@ public class TaskMapper {
             task.setDueDate(dto.dueDate());
         }
 
-        if (dto.assigneeId() != null) {
-            User assignee = userRepository.findById(dto.assigneeId()).orElseThrow( () -> new NotFoundException("Assignee not found"));
+        if (dto.assigneeEmail() != null) {
+            User assignee = userRepository.findByEmail(dto.assigneeEmail()).orElseThrow( () -> new NotFoundException("Assignee not found"));
             task.setAssignee(assignee);
         }
 
