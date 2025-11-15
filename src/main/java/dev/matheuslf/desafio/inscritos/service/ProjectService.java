@@ -78,9 +78,9 @@ public class ProjectService {
         return projectMapper.toDTO(updatedProject);
     }
 
-    public List<ProjectResponseDTO> findProjectsByOwner(UUID ownerId) {
-        User owner = userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException("Owner not found"));
-        return projectRepository.findByOwner(owner)
+    public List<ProjectResponseDTO> findProjectsByOwnerOrAssignee(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        return projectRepository.findByOwnerOrAssignee(user)
                 .stream()
                 .map(projectMapper::toDTO)
                 .toList();
