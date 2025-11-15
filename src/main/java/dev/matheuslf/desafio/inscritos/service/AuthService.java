@@ -32,6 +32,7 @@ public class AuthService {
     private final TokenService tokenService;
     private final PasswordRecoveryTokenRepository passwordRecoveryTokenRepository;
     private final PasswordRecoveryTokenMapper passwordRecoveryTokenMapper;
+    private final EmailService emailService;
 
     public LoginResponseDTO login(LoginRequestDTO dto) {
         log.info("Login request received with email: {}", dto.email());
@@ -58,10 +59,15 @@ public class AuthService {
     }
 
     public RecoveryResponseDTO generateRecoveryToken(RecoveryRequestDTO dto) {
-        User user = userRepository.findByEmail(dto.email()).orElseThrow(() -> new NotFoundException("User not found with email"));
+        User user = userRepository.findByEmail(dto.email())
+                .orElseThrow(() -> new NotFoundException("User not found with email"));
+
         PasswordRecoveryToken recoveryToken = new PasswordRecoveryToken();
         recoveryToken.setUser(user);
         PasswordRecoveryToken savedToken = passwordRecoveryTokenRepository.save(recoveryToken);
+
+        emailService.sendPasswordRecoveryEmail(user.getEmail(), savedToken.getId());
+
         return passwordRecoveryTokenMapper.toDTO(savedToken);
     }
 
