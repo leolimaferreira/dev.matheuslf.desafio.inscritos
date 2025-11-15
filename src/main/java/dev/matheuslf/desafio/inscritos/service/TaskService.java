@@ -49,6 +49,8 @@ public class TaskService {
             taskValidator.validateDescription(dto.description());
         }
 
+        task.getProject().getAssignees().add(task.getAssignee());
+
         Task savedTask = taskRepository.save(task);
         return taskMapper.toDTO(savedTask);
     }
