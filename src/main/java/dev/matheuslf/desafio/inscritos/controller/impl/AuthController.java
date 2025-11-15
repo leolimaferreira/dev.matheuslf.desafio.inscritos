@@ -7,6 +7,7 @@ import dev.matheuslf.desafio.inscritos.dto.recovery.ChangePasswordDTO;
 import dev.matheuslf.desafio.inscritos.dto.recovery.RecoveryRequestDTO;
 import dev.matheuslf.desafio.inscritos.dto.recovery.RecoveryResponseDTO;
 import dev.matheuslf.desafio.inscritos.service.AuthService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class AuthController implements GenericController {
     }
 
     @PostMapping("/generate-recovery-token")
-    public ResponseEntity<RecoveryResponseDTO> generateRecoveryToken(@RequestBody RecoveryRequestDTO dto) {
+    public ResponseEntity<RecoveryResponseDTO> generateRecoveryToken(@RequestBody RecoveryRequestDTO dto) throws MessagingException {
         return ResponseEntity.ok(authService.generateRecoveryToken(dto));
     }
 

@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import dev.matheuslf.desafio.inscritos.dto.error.ResponseError;
 import dev.matheuslf.desafio.inscritos.exception.*;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -149,6 +150,13 @@ public class GlobalExceptionHandler{
     public ResponseError handleJWTCreationException(JWTCreationException e) {
         log.error("Error while authenticating: {}", e.getMessage());
         return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), List.of());
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleSMessagingException(MessagingException e) {
+        log.error("Error while sending recovery email: {}", e.getMessage());
+        return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), List.of());
     }
 
     @ExceptionHandler(JWTVerificationException.class)

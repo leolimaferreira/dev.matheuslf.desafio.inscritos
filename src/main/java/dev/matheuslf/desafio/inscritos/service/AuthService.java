@@ -15,6 +15,7 @@ import dev.matheuslf.desafio.inscritos.mapper.PasswordRecoveryTokenMapper;
 import dev.matheuslf.desafio.inscritos.repository.PasswordRecoveryTokenRepository;
 import dev.matheuslf.desafio.inscritos.repository.UserRepository;
 import dev.matheuslf.desafio.inscritos.security.TokenService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -58,7 +59,7 @@ public class AuthService {
         return new LoginResponseDTO(token, user.getName());
     }
 
-    public RecoveryResponseDTO generateRecoveryToken(RecoveryRequestDTO dto) {
+    public RecoveryResponseDTO generateRecoveryToken(RecoveryRequestDTO dto) throws MessagingException {
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> new NotFoundException("User not found with email"));
 
