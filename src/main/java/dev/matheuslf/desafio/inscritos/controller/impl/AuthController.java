@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -39,5 +41,11 @@ public class AuthController implements GenericController {
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordDTO dto) {
         authService.changePassword(dto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/oauth2/google")
+    public ResponseEntity<Map<String, String>> initiateGoogleLogin() {
+        String authorizationUrl = "/oauth2/authorization/google";
+        return ResponseEntity.ok(Map.of("redirectUrl", authorizationUrl));
     }
 }

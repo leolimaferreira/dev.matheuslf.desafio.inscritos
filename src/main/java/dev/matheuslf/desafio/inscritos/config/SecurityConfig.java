@@ -1,5 +1,6 @@
 package dev.matheuslf.desafio.inscritos.config;
 
+import dev.matheuslf.desafio.inscritos.security.OAuth2LoginSucessHandler;
 import dev.matheuslf.desafio.inscritos.security.SecurityFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final OAuth2LoginSucessHandler oAuth2LoginSucessHandler;
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String TASKS_PARAMS_PATH = "/tasks/**";
     private static final String PROJECTS_PARAMS_PATH = "/projects/**";
@@ -31,6 +33,10 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2LoginSucessHandler)
+                        .failureUrl("/login?error=ture")
+                )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
