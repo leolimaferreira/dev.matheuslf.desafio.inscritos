@@ -38,7 +38,7 @@ public class ProjectService {
         projectValidator.validate(project);
 
         if (dto.endDate().isBefore(project.getStartDate())) {
-            throw new ConflictException("Project's start date must be before the end date.");
+            throw new InvalidProjectDatesException("Project's start date must be before the end date.");
         }
 
         Project savedProject = projectRepository.save(project);
@@ -51,8 +51,13 @@ public class ProjectService {
         return projects.map(projectMapper::toDTO);
     }
 
-    public void deleteProject(UUID id) {
+    public void deleteProject(String token, UUID id) {
         Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException(PROJECT_NOT_FOUND));
+
+        if (isOwnerOrAdmin(token, project)) {
+            throw new UnauthorizedException("You are not allowed to update this project.");
+        }
+
         if (taskService.hasDoingTasks(project)) {
             throw new ProjectWithActiveTasksException("There are tasks with status DOING in this project");
         }
@@ -60,25 +65,20 @@ public class ProjectService {
         projectMapper.toDTO(project);
     }
 
-    public ProjectResponseDTO updateProject(String token, UUID id, UpdateProjectDTO dto) {
+    public void updateProject(String token, UUID id, UpdateProjectDTO dto) {
         Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException(PROJECT_NOT_FOUND));
 
-        DecodedJWT decodedToken = JWT.decode(token);
-        boolean isOwner = decodedToken.getSubject().equals(project.getOwner().getId().toString());
-        boolean isAdmin = decodedToken.getClaim("role").asString().equals("ADMIN");
-
-        if (!(isOwner || isAdmin)) {
+        if (isOwnerOrAdmin(token, project)) {
             throw new UnauthorizedException("You are not allowed to update this project.");
         }
 
         projectValidator.validate(project);
 
         projectMapper.updateEntity(project, dto);
-        Project updatedProject = projectRepository.save(project);
-        return projectMapper.toDTO(updatedProject);
+        projectRepository.save(project);
     }
 
-    public List<ProjectResponseDTO> findProjectsByOwnerOrAssignee(UUID userId) {
+    public List<ProjectResponseDTO> findByUser(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         return projectRepository.findByOwnerOrAssignee(user)
                 .stream()
@@ -89,5 +89,10 @@ public class ProjectService {
     public ProjectResponseDTO findProjectById(UUID id) {
         Project project = projectRepository.findById(id).orElseThrow( () -> new NotFoundException(PROJECT_NOT_FOUND));
         return projectMapper.toDTO(project);
+    }
+
+    private boolean isOwnerOrAdmin(String token, Project project) {
+        DecodedJWT decodedToken = JWT.decode(token);
+        return !decodedToken.getClaim("role").asString().equals("ADMIN") && !decodedToken.getSubject().equals(project.getOwner().getId().toString());
     }
 }
