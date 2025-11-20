@@ -7,6 +7,7 @@ import dev.matheuslf.desafio.inscritos.dto.project.UpdateProjectDTO;
 import dev.matheuslf.desafio.inscritos.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/projects")
+@Tag(name = "Projetos")
 public class ProjectController implements GenericController {
 
     private final ProjectService projectService;
@@ -55,7 +57,7 @@ public class ProjectController implements GenericController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Busca de projeto", description = "Retorna um projeto com base no id passado")
+    @Operation(summary = "Busca de projetos", description = "Retorna um projeto com base no id passado")
     @ApiResponse(responseCode = "200", description = "Projeto retornado com sucesso.")
     @ApiResponse(responseCode = "404", description = "Projeto nao encontrado.")
     public ResponseEntity<ProjectResponseDTO> findById(@PathVariable(value = "id") UUID id) {
@@ -63,7 +65,7 @@ public class ProjectController implements GenericController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizaçao de projeto", description = "Atualiza um projeto parcialmente")
+    @Operation(summary = "Atualizaçao de projetos", description = "Atualiza um projeto parcialmente")
     @ApiResponse(responseCode = "204", description = "Projeto atualizado com sucesso.")
     @ApiResponse(responseCode = "400", description = "Novos dados inválidos.")
     @ApiResponse(responseCode = "401", description = "Usuário sem autorizaçao para atualizar o projeto.")
@@ -82,7 +84,7 @@ public class ProjectController implements GenericController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deleçao de projeto", description = "Deleta um projeto")
+    @Operation(summary = "Deleçao de projetos", description = "Deleta um projeto")
     @ApiResponse(responseCode = "204", description = "Projeto deletado com sucesso.")
     @ApiResponse(responseCode = "401", description = "Usuário sem autorizaçao para deletar o projeto.")
     @ApiResponse(responseCode = "404", description = "Projeto nao encontrado.")

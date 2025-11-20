@@ -41,7 +41,7 @@ public class AuthController implements GenericController {
     }
 
     @PostMapping("/generate-recovery-token")
-    @Operation(summary = "Recuperaçao de senha", description = "Enviar email para recuperar senha")
+    @Operation(summary = "Recuperaçao de senhas", description = "Enviar email para recuperar senha")
     @ApiResponse(responseCode = "200", description = "Email enviado com sucesso.")
     @ApiResponse(responseCode = "400", description = "Erro ao enviar email.")
     @ApiResponse(responseCode = "404", description = "Usuário nao encontrado.")
@@ -50,7 +50,7 @@ public class AuthController implements GenericController {
     }
 
     @PostMapping("/change-password")
-    @Operation(summary = "Atualizaçao de senha", description = "Atualizar senha do usuário")
+    @Operation(summary = "Atualizaçao de senhas", description = "Atualizar senha do usuário")
     @ApiResponse(responseCode = "204", description = "Senha atualizada com sucesso.")
     @ApiResponse(responseCode = "400", description = "Nova senha nao pode ser igual a atual.")
     @ApiResponse(responseCode = "400", description = "Token de recuperaçao de senha expirado.")
